@@ -1,8 +1,8 @@
 import './App.css'
-import Homepage from './components/Homepage'
+import DeliveryCalculator from './components/DeliveryCalculator'
 
 function App() {
-  return <Homepage />
+  return <DeliveryCalculator />
 }
 
 export default App

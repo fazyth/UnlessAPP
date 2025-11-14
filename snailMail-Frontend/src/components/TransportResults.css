@@ -1,0 +1,256 @@
+.transport-results {
+  width: 100%;
+  max-width: 1400px;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.results-header {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.results-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.route-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.route-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.route-label {
+  font-size: 0.85rem;
+  color: #777;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.route-value {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.route-arrow {
+  font-size: 2rem;
+  color: #667eea;
+  font-weight: bold;
+}
+
+.distance-summary {
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.distance-icon {
+  font-size: 1.5rem;
+}
+
+.distance-text {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.estimate-badge {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  cursor: help;
+}
+
+.transport-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.transport-card-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+}
+
+.transport-card-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.transport-card-wrapper.selected {
+  border-color: #667eea;
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+}
+
+.transport-header {
+  margin-bottom: 1rem;
+}
+
+.transport-name {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 0.8rem;
+}
+
+.delivery-time-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.transport-details {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+  animation: slideDown 0.3s ease-out;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.detail-value {
+  color: #333;
+  text-align: right;
+}
+
+.detail-value.highlight {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.detail-value.small {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.results-actions {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.reset-button {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: white;
+  color: #667eea;
+  border: 3px solid #667eea;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.reset-button:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.reset-button:active {
+  transform: translateY(0);
+}
+
+.results-footer {
+  text-align: center;
+  color: white;
+  margin-top: 2rem;
+}
+
+.footer-note {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  display: inline-block;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .transport-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-title {
+    font-size: 2rem;
+  }
+
+  .route-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .route-arrow {
+    transform: rotate(90deg);
+  }
+}
