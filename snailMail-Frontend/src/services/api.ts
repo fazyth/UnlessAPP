@@ -45,6 +45,46 @@ export interface CalculateAllResponse {
   error?: string;
 }
 
+export interface SendEmailRequest {
+  from: string;
+  to: string;
+  subject: string;
+  message: string;
+  transportMode: 'walking' | 'swimming' | 'pigeon' | 'rock-climbing';
+  deliveryTimeSeconds: number;
+  speedMultiplier?: number;
+}
+
+export interface SendEmailResponse {
+  success: boolean;
+  data?: {
+    jobId: string;
+    status: string;
+    transportMode: string;
+    estimatedDeliveryTime: number;
+    originalDeliveryTime: number;
+    speedMultiplier: number;
+    message: string;
+  };
+  error?: string;
+}
+
+export interface EmailStatusResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    status: 'pending' | 'in-transit' | 'delivered' | 'failed';
+    progress: number;
+    transportMode: string;
+    from: string;
+    to: string;
+    elapsedSeconds: number;
+    remainingSeconds: number;
+    totalDeliverySeconds: number;
+  };
+  error?: string;
+}
+
 class ApiService {
   private baseUrl: string;
 
@@ -119,6 +159,52 @@ class ApiService {
       console.error('Health check failed:', error);
       return false;
     }
+  }
+
+  /**
+   * Send an email with delayed delivery
+   */
+  async sendEmail(request: SendEmailRequest): Promise<SendEmailResponse> {
+    const response = await fetch(`${this.baseUrl}/api/email/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const result: SendEmailResponse = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to send email');
+    }
+
+    return result;
+  }
+
+  /**
+   * Get email delivery status
+   */
+  async getEmailStatus(jobId: string): Promise<EmailStatusResponse> {
+    const response = await fetch(`${this.baseUrl}/api/email/status/${jobId}`);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const result: EmailStatusResponse = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to get email status');
+    }
+
+    return result;
   }
 }
 

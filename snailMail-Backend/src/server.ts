@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import distanceRoutes from './routes/distance.js';
+import emailRoutes from './routes/email.js';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/distance', distanceRoutes);
+app.use('/api/email', emailRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -35,6 +37,9 @@ app.get('/', (req, res) => {
       health: 'GET /api/distance/health',
       calculate: 'POST /api/distance/calculate',
       calculateAll: 'POST /api/distance/calculate-all',
+      sendEmail: 'POST /api/email/send',
+      emailStatus: 'GET /api/email/status/:jobId',
+      emailJobs: 'GET /api/email/jobs',
     },
   });
 });

@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { apiService } from '../services/api';
 import type { DeliveryEstimate } from '../services/api';
 import TransportMode from './TransportMode';
 import type { TransportType } from './TransportMode';
+import EmailComposer from './EmailComposer';
+import EmailDeliveryProgress from './EmailDeliveryProgress';
 import './TransportResults.css';
 
 interface TransportResultsProps {
@@ -21,6 +24,18 @@ interface TransportOption {
 
 const TransportResults = ({ results, origin, destination, onReset }: TransportResultsProps) => {
   const [selectedTransport, setSelectedTransport] = useState<TransportType | null>(null);
+  const [composingEmail, setComposingEmail] = useState<TransportType | null>(null);
+  const [emailJob, setEmailJob] = useState<{
+    jobId: string;
+    transportMode: TransportType;
+    from: string;
+    to: string;
+    estimatedDeliveryTime: number;
+    originalDeliveryTime: number;
+    speedMultiplier: number;
+  } | null>(null);
+  const [speedMultiplier, setSpeedMultiplier] = useState(3600); // Default: 1 hour = 1 second
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   const transportDescriptions: Record<TransportType, { emoji: string; description: string }> = {
     pigeon: {
@@ -54,6 +69,51 @@ const TransportResults = ({ results, origin, destination, onReset }: TransportRe
 
   const handleTransportClick = (transport: TransportOption) => {
     setSelectedTransport(selectedTransport === transport.type ? null : transport.type);
+  };
+
+  const handleSendEmail = (transportMode: TransportType) => {
+    setComposingEmail(transportMode);
+    setEmailError(null);
+  };
+
+  const handleEmailSend = async (from: string, to: string, subject: string, message: string) => {
+    if (!composingEmail) return;
+
+    setEmailError(null);
+
+    try {
+      const transport = transportOptions.find((t) => t.type === composingEmail);
+      if (!transport) throw new Error('Transport not found');
+
+      const response = await apiService.sendEmail({
+        from,
+        to,
+        subject,
+        message,
+        transportMode: composingEmail,
+        deliveryTimeSeconds: transport.estimate.deliveryTimeSeconds,
+        speedMultiplier,
+      });
+
+      if (response.data) {
+        setEmailJob({
+          jobId: response.data.jobId,
+          transportMode: composingEmail,
+          from,
+          to,
+          estimatedDeliveryTime: response.data.estimatedDeliveryTime,
+          originalDeliveryTime: response.data.originalDeliveryTime,
+          speedMultiplier: response.data.speedMultiplier,
+        });
+        setComposingEmail(null);
+      }
+    } catch (error) {
+      setEmailError(error instanceof Error ? error.message : 'Failed to send email');
+    }
+  };
+
+  const handleDeliveryComplete = () => {
+    setEmailJob(null);
   };
 
   return (
@@ -131,6 +191,17 @@ const TransportResults = ({ results, origin, destination, onReset }: TransportRe
                     {transport.estimate.origin} → {transport.estimate.destination}
                   </span>
                 </div>
+                <div className="send-email-section">
+                  <button
+                    className="send-email-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSendEmail(transport.type);
+                    }}
+                  >
+                    📧 Send Email via {transport.type.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -138,16 +209,77 @@ const TransportResults = ({ results, origin, destination, onReset }: TransportRe
       </div>
 
       <div className="results-actions">
+        <div className="speed-control">
+          <label htmlFor="speed-multiplier">
+            Demo Speed Multiplier: <strong>{speedMultiplier}x</strong>
+          </label>
+          <input
+            id="speed-multiplier"
+            type="range"
+            min="1"
+            max="86400"
+            step="1"
+            value={speedMultiplier}
+            onChange={(e) => setSpeedMultiplier(parseInt(e.target.value))}
+            className="speed-slider"
+          />
+          <div className="speed-presets">
+            <button onClick={() => setSpeedMultiplier(60)} className="preset-button">
+              1 min = 1s
+            </button>
+            <button onClick={() => setSpeedMultiplier(3600)} className="preset-button">
+              1 hr = 1s
+            </button>
+            <button onClick={() => setSpeedMultiplier(86400)} className="preset-button">
+              1 day = 1s
+            </button>
+          </div>
+          <p className="speed-help">
+            Adjust how fast emails are delivered for demo purposes. Higher = faster delivery!
+          </p>
+        </div>
+
         <button className="reset-button" onClick={onReset}>
           🔄 Calculate New Route
         </button>
       </div>
 
+      {emailError && (
+        <div className="email-error">
+          <span className="error-icon">⚠️</span>
+          <span>{emailError}</span>
+        </div>
+      )}
+
       <div className="results-footer">
         <p className="footer-note">
-          💡 <strong>Tip:</strong> Click on any transport method to see detailed information!
+          💡 <strong>Tip:</strong> Click on any transport method to see detailed information and send emails!
         </p>
       </div>
+
+      {composingEmail && (
+        <EmailComposer
+          transportMode={composingEmail}
+          estimate={transportOptions.find((t) => t.type === composingEmail)!.estimate}
+          origin={origin}
+          destination={destination}
+          onSend={handleEmailSend}
+          onCancel={() => setComposingEmail(null)}
+        />
+      )}
+
+      {emailJob && (
+        <EmailDeliveryProgress
+          jobId={emailJob.jobId}
+          transportMode={emailJob.transportMode}
+          from={emailJob.from}
+          to={emailJob.to}
+          estimatedDeliveryTime={emailJob.estimatedDeliveryTime}
+          originalDeliveryTime={emailJob.originalDeliveryTime}
+          speedMultiplier={emailJob.speedMultiplier}
+          onComplete={handleDeliveryComplete}
+        />
+      )}
     </div>
   );
 };
